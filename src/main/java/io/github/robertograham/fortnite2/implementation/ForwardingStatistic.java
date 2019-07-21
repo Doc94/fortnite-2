@@ -14,6 +14,11 @@ abstract class ForwardingStatistic implements Statistic {
     }
 
     @Override
+    public final long deaths() {
+        return statistic.deaths();
+    }
+
+    @Override
     public final long wins() {
         return statistic.wins();
     }
