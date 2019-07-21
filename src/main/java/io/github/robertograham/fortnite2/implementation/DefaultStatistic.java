@@ -5,10 +5,7 @@ import io.github.robertograham.fortnite2.domain.Statistic;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -18,6 +15,7 @@ final class DefaultStatistic implements Statistic {
     private final long matches;
     private final long kills;
     private final long score;
+    private final long deaths;
     private final long timesPlacedTop10;
     private final long timesPlacedTop25;
     private final long timesPlacedTop5;
@@ -25,6 +23,7 @@ final class DefaultStatistic implements Statistic {
     private final long timesPlacedTop3;
     private final long timesPlacedTop6;
     private final LocalDateTime timeLastModified;
+    private final Set<RawStatistic> rawStatistics;
 
     DefaultStatistic(final Set<RawStatistic> rawStatistics) {
         final Map<String, Long> summedValuesGroupedByStatType =
@@ -34,17 +33,19 @@ final class DefaultStatistic implements Statistic {
                     RawStatistic::type,
                     Collectors.summingLong(RawStatistic::value)
                 ));
-        wins = summedValuesGroupedByStatType.getOrDefault("placetop1", 0L);
-        matches = summedValuesGroupedByStatType.getOrDefault("matchesplayed", 0L);
-        kills = summedValuesGroupedByStatType.getOrDefault("kills", 0L);
-        score = summedValuesGroupedByStatType.getOrDefault("score", 0L);
-        timesPlacedTop10 = summedValuesGroupedByStatType.getOrDefault("placetop10", 0L);
-        timesPlacedTop25 = summedValuesGroupedByStatType.getOrDefault("placetop25", 0L);
-        timesPlacedTop5 = summedValuesGroupedByStatType.getOrDefault("placetop5", 0L);
-        timesPlacedTop12 = summedValuesGroupedByStatType.getOrDefault("placetop12", 0L);
-        timesPlacedTop3 = summedValuesGroupedByStatType.getOrDefault("placetop3", 0L);
-        timesPlacedTop6 = summedValuesGroupedByStatType.getOrDefault("placetop6", 0L);
-        timeLastModified = rawStatistics.stream()
+        this.rawStatistics = rawStatistics;
+        this.wins = summedValuesGroupedByStatType.getOrDefault("placetop1", 0L);
+        this.matches = summedValuesGroupedByStatType.getOrDefault("matchesplayed", 0L);
+        this.kills = summedValuesGroupedByStatType.getOrDefault("kills", 0L);
+        this.score = summedValuesGroupedByStatType.getOrDefault("score", 0L);
+        this.deaths = Math.abs(matches - wins);
+        this.timesPlacedTop10 = summedValuesGroupedByStatType.getOrDefault("placetop10", 0L);
+        this.timesPlacedTop25 = summedValuesGroupedByStatType.getOrDefault("placetop25", 0L);
+        this.timesPlacedTop5 = summedValuesGroupedByStatType.getOrDefault("placetop5", 0L);
+        this.timesPlacedTop12 = summedValuesGroupedByStatType.getOrDefault("placetop12", 0L);
+        this.timesPlacedTop3 = summedValuesGroupedByStatType.getOrDefault("placetop3", 0L);
+        this.timesPlacedTop6 = summedValuesGroupedByStatType.getOrDefault("placetop6", 0L);
+        this.timeLastModified = rawStatistics.stream()
             .filter(rawStatistic -> "lastmodified".equals(rawStatistic.type()))
             .max(Comparator.comparingLong(RawStatistic::value))
             .map((final var rawStatistic) ->
@@ -54,6 +55,15 @@ final class DefaultStatistic implements Statistic {
                 )
             )
             .orElse(LocalDateTime.MIN);
+    }
+
+    public Set<RawStatistic> getRawStatistics() {
+        return rawStatistics;
+    }
+
+    @Override
+    public long deaths() {
+        return deaths;
     }
 
     @Override

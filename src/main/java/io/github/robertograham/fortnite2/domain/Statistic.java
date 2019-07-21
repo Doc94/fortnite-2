@@ -10,6 +10,12 @@ import java.time.LocalDateTime;
 public interface Statistic {
 
     /**
+     * @return number of deaths
+     * @since 3.1.1
+     */
+    long deaths();
+
+    /**
      * @return number of wins
      * @since 1.0.0
      */

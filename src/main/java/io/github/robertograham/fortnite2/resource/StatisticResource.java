@@ -107,8 +107,6 @@ public interface StatisticResource {
      *                                  200 or greater than 299) or if there's a problem reading the
      *                                  API response
      * @throws NullPointerException     if {@code accountId} is {@code null}
-     * @throws NullPointerException     if {@code startTime} is {@code null}
-     * @throws NullPointerException     if {@code endTime} is {@code null}
      * @throws IllegalArgumentException if {@code startTime} is greater than or equal to {@code endTime}
      * @since 3.1.0
      */
@@ -128,8 +126,6 @@ public interface StatisticResource {
      *                                  200 or greater than 299) or if there's a problem reading the
      *                                  API response
      * @throws NullPointerException     if {@code account} is {@code null}
-     * @throws NullPointerException     if {@code startTime} is {@code null}
-     * @throws NullPointerException     if {@code endTime} is {@code null}
      * @throws IllegalArgumentException if {@code startTime} is greater than or equal to {@code endTime}
      * @since 3.1.0
      */
@@ -148,8 +144,6 @@ public interface StatisticResource {
      * @throws IOException              if there's an unexpected HTTP status code (less than
      *                                  200 or greater than 299) or if there's a problem reading the
      *                                  API response
-     * @throws NullPointerException     if {@code startTime} is {@code null}
-     * @throws NullPointerException     if {@code endTime} is {@code null}
      * @throws IllegalArgumentException if {@code startTime} is greater than or equal to {@code endTime}
      * @since 3.1.0
      */

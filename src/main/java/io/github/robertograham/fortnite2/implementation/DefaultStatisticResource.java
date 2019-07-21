@@ -89,22 +89,30 @@ final class DefaultStatisticResource implements StatisticResource {
                                                               final ZonedDateTime startTime,
                                                               final ZonedDateTime endTime) throws IOException {
         Objects.requireNonNull(accountId, "accountId cannot be null");
-        Objects.requireNonNull(startTime, "startTime cannot be null");
-        Objects.requireNonNull(endTime, "endTime cannot be null");
-        if (startTime.isEqual(endTime) || startTime.isAfter(endTime))
-            throw new IllegalArgumentException("startTime must be less than endTime");
-        return httpClient.execute(
-            RequestBuilder.get(String.format(
+
+        if(startTime != null && endTime != null) {
+            if (startTime.isEqual(endTime) || startTime.isAfter(endTime))
+                throw new IllegalArgumentException("startTime must be less than endTime");
+        }
+
+        RequestBuilder requestBuilder = RequestBuilder.get(String.format(
                 "%s/%s",
                 "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/statsv2/account",
                 accountId
-            ))
-                .addParameter("startTime", String.valueOf(startTime.withZoneSameInstant(ZoneOffset.UTC)
-                    .toEpochSecond()))
-                .addParameter("endTime", String.valueOf(endTime.withZoneSameInstant(ZoneOffset.UTC)
-                    .toEpochSecond()))
-                .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
-                .build(),
+        )).setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get());
+
+        if(startTime != null) {
+            requestBuilder.addParameter("startTime", String.valueOf(startTime.withZoneSameInstant(ZoneOffset.UTC)
+                    .toEpochSecond()));
+        }
+
+        if(endTime != null) {
+            requestBuilder.addParameter("endTime", String.valueOf(endTime.withZoneSameInstant(ZoneOffset.UTC)
+                    .toEpochSecond()));
+        }
+
+        return httpClient.execute(
+            requestBuilder.build(),
             optionalResponseHandlerProvider.forClass(StatisticsV2.class)
         )
             .map(StatisticsV2::rawStatistics)
