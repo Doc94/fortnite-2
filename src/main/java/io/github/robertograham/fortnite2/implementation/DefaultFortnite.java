@@ -13,9 +13,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.time.LocalDateTime;
+import java.util.Enumeration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -48,8 +49,7 @@ public final class DefaultFortnite implements Fortnite {
         code = builder.code;
         httpClient = HttpClientBuilder.create()
             .setDefaultHeaders(Set.of(new BasicHeader("X-Epic-Device-ID", "".equals(builder.deviceId) ?
-                DigestUtils.md5Hex(NetworkInterface.getByInetAddress(InetAddress.getLocalHost())
-                    .getHardwareAddress())
+                DigestUtils.md5Hex(getHardwareAddress())
                 : builder.deviceId)))
             .build();
         authenticationResource = AuthenticationResource.newInstance(
@@ -330,5 +330,15 @@ public final class DefaultFortnite implements Fortnite {
         public Fortnite build() throws IOException {
             return new DefaultFortnite(this);
         }
+    }
+
+    private byte[] getHardwareAddress() throws SocketException {
+        for(Enumeration enm = NetworkInterface.getNetworkInterfaces(); enm.hasMoreElements();){
+            NetworkInterface network = (NetworkInterface) enm.nextElement();
+            if(null != network.getHardwareAddress()){
+                return network.getHardwareAddress();
+            }
+        }
+        return new byte[0];
     }
 }
